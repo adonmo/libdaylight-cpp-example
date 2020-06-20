@@ -1,0 +1,29 @@
+name: Tests
+
+on: [push, pull_request]
+
+env:
+  CMAKE_VERSION: 3.16.2
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Configure CMake for tests
+      run: cmake -B build -S . -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+
+    - name: Build
+      run: cmake --build build
+
+    - name: Run the executable
+      id: run-executable
+      run: echo "::set-output name=irradiance::$(./build/myproj)"
+
+    - name: Fail if output is not as expected
+      if: steps.run-executable.outputs.irradiance != 0.882754
+      run: exit 1
